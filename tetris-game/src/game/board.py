@@ -7,6 +7,21 @@ class Board:
         self.height = 20
         self.grid = [[0 for _ in range(self.width)] for _ in range(self.height)]
         self.cell_size = 30
+        self.background = pygame.Surface((self.width * self.cell_size, 
+                                       self.height * self.cell_size))
+        self._init_background()
+
+    def _init_background(self):
+        """Pre-render the background grid"""
+        for y in range(self.height):
+            for x in range(self.width):
+                pygame.draw.rect(
+                    self.background,
+                    (50, 50, 50),
+                    (x * self.cell_size, y * self.cell_size,
+                     self.cell_size, self.cell_size),
+                    1
+                )
 
     def check_collision(self, tetromino):
         for y, row in enumerate(tetromino.shape):
@@ -37,15 +52,19 @@ class Board:
                         self.grid[board_y][board_x] = 1
 
     def draw(self, surface):
+        # Draw pre-rendered background
+        surface.blit(self.background, (0, 0))
+        # Draw only filled cells
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
-                pygame.draw.rect(
-                    surface,
-                    (128, 128, 128) if cell else (50, 50, 50),
-                    (x * self.cell_size, y * self.cell_size,
-                     self.cell_size, self.cell_size),
-                    0 if cell else 1
-                )
+                if cell:
+                    pygame.draw.rect(
+                        surface,
+                        (128, 128, 128),
+                        (x * self.cell_size, y * self.cell_size,
+                         self.cell_size, self.cell_size),
+                        0
+                    )
 
     def clear_lines(self):
         lines_cleared = 0
