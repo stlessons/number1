@@ -2,22 +2,28 @@ import pygame
 from game.board import Board
 from game.tetromino import Tetromino
 from game.utils import generate_random_tetromino
+import random
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the game window
-WINDOW_WIDTH = 300
+WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
+BLOCK_SIZE = 30
 WINDOW = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("TETRIS")
+
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
 # Game variables
 board = Board()
 current_tetromino = generate_random_tetromino()
-clock = pygame.time.Clock()
+fall_speed = 0.05  # Decreased from 0.5 to make pieces fall faster
 fall_time = 0
-fall_speed = 500  # milliseconds
+clock = pygame.time.Clock()
 
 def draw_window():
     WINDOW.fill((0, 0, 0))  # Clear the window
@@ -43,17 +49,19 @@ def handle_input():
 def main():
     global fall_time
     global current_tetromino  # Add this line
-    while True:
+    running = True
+    while running:
         fall_time += clock.get_rawtime()
         handle_input()
         
-        if fall_time >= fall_speed:
+        # Force piece down faster
+        if fall_time/1000 > fall_speed:
+            fall_time = 0
             current_tetromino.move_down()
             if board.check_collision(current_tetromino):
                 board.add_tetromino(current_tetromino)
                 current_tetromino = generate_random_tetromino()
                 board.clear_lines()
-            fall_time = 0
         
         draw_window()
         clock.tick(60)  # Limit to 60 frames per second
